@@ -1,0 +1,119 @@
+#splash {
+    margin:200px 0;
+}
+
+    #splash input[type = "text"] {
+        width:100%;
+    }
+
+    #select-repository .repo-entry {
+        padding:0.5em 0;
+        -webkit-border-radius: 2px;
+        border-radius: 2px;
+        border:1px solid #fff;
+    }
+
+    #select-repository li.repo-entry:hover {
+        border:1px solid #ddd;
+        cursor:pointer;
+    }
+
+    #select-repository .repo-entry .repo-name {
+        font-weight:bold;
+    }
+
+    #select-file li.dir {
+        font-weight:bold;
+        cursor:pointer;
+    }
+
+    #select-file li.file {
+        font-weight:normal;
+        cursor:pointer;
+    }    
+
+    #select-file li.dir.loading .dirname:after {
+        content:" (Loading...)";
+        font-weight:normal;
+    }
+
+#loading-commits {
+    margin:200px 0;
+    text-align:center;
+}
+
+    #loading-commits > div > div {
+        margin:2em 0;
+    }
+
+#code-view #commits {
+    position:fixed;
+    overflow:scroll;
+    width:360px;
+    height:95%;
+    right:0;
+    background:#fff;
+}
+
+#code-view #commits ul {
+    list-style:none;
+}
+
+#code-view #commits li { 
+    width:300px;
+    margin:0.2em;
+    padding:0.5em;
+    font-size:12px;
+    cursor:pointer;
+}
+
+#code-view #commits li .committer,
+#code-view #commits li .commit_date { 
+    color:#666;
+}
+
+#code-view #commits li .committer { 
+    font-weight:bold;
+}
+
+#code-view #commits li .commit_date { 
+    font-style:italic;
+}
+
+#code-view #commits li.current-commit { 
+    background:#333;
+    color:#fff;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}
+
+#code-view #commits li.current-commit .committer,
+#code-view #commits li.current-commit .commit_date { 
+    color:#eee;
+}
+
+#code-view #code {
+    margin:2em;
+    font-size:12px;
+    line-height:12px;
+    margin-left:3em;
+}
+
+#code-view #code ol {
+    font-family:monospace;
+    white-space:pre;
+}
+
+#code-view #code li {
+    line-height:14px;
+}
+
+#code-view #code li.new {
+    color:green;
+}
+
+
+
+
+
+

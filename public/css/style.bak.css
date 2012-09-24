@@ -1,0 +1,66 @@
+body {
+  padding:0 20px 20px 20px;
+  font-family:monospace;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#controls {
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    padding:20px 0 0 20px;
+    
+    background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(255,255,255,1) 85%, rgba(255,255,255,0) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(85%,rgba(255,255,255,1)), color-stop(100%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 85%,rgba(255,255,255,0) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 85%,rgba(255,255,255,0) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 85%,rgba(255,255,255,0) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(255,255,255,1) 85%,rgba(255,255,255,0) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=0 ); /* IE6-9 */
+
+}
+
+#controls button {
+    font-size:30pt;
+    border:none;
+    background:transparent;
+}
+
+#controls button:hover {
+    cursor:pointer;
+    color:#666;
+}
+
+#controls #current-commit {
+    display:inline-block;  
+    height: 20px;
+    position: relative;
+    left:10px;
+    top: -10px;  
+}
+
+ol#code {
+    margin-top:80px;
+    font-size:8pt;
+}
+
+ol#code li { 
+    margin-bottom:0pt; 
+    white-space:pre; 
+}
+
+
+.transition-out { 
+    background:rgba(255, 0, 0, 0.1); 
+    color:red;
+}
+.transition-in { 
+    background:rgba(0, 255, 0, 0.1); 
+    color:green;
+}
+
+.highlight { color:#888; }

@@ -1,0 +1,8 @@
+if repos.length
+    ol
+        for repo in repos
+            li.repo-entry
+                .repo-name= repo.name
+                .repo-desc= repo.description
+else
+    span User not found.

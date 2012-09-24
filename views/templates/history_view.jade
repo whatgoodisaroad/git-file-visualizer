@@ -1,0 +1,16 @@
+#code-view
+    #controls
+    #commits
+        ul
+            - var idx = commits.length - 1;
+            for commit in commits
+                li(data-index = idx--)
+                    span.committer= commit.committer
+                    text= " @ "
+                    span.commit_date= commit.commit_date
+                    text= " "
+                    span.message!= commit.message.replace(/\S{10,15}/g, "$&<wbr/>")
+    #code
+        div Loading code...
+        div
+            img(src = "/img/spinner.gif")

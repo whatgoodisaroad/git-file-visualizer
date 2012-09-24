@@ -1,0 +1,10 @@
+ul.repo-dir
+    for file in files
+        if file.type == "dir"
+            li.dir
+                span.dirname(data-path = file.path)= file.name
+                .children
+    for file in files
+        if file.type == "file"
+            li.file
+                span.filename(data-path = file.path)= file.name
