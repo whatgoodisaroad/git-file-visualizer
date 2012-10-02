@@ -80,9 +80,16 @@
     font-style:italic;
 }
 
-#code-view #commits li.current-commit { 
+#code-view #commits li.current-commit,
+#code-view #commits li.current-commit:hover { 
     background:#333;
     color:#fff;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}
+
+#code-view #commits li:hover { 
+    background:#eee;
     -webkit-border-radius: 2px;
     border-radius: 2px;
 }

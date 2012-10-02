@@ -389,27 +389,12 @@ var App = {
 
                             // Apply:
                             var 
-                                dmp = new diff_match_patch(),
-
                                 rawPatch = history.commits[idx].blob.patch,
 
-                                treatedPatch = rawPatch;
-
-                                // patches = dmp.patch_fromText(
-                                //     treatedPatch
-                                // ),
-
-                                // patchResult = dmp.patch_apply(
-                                //     patches, 
-                                //     previousText
-                                // ),
-                                // patchedText = patchResult[0];
-
-
-                            patchedText = App.applyUnifiedPatch(
-                                previousText, 
-                                rawPatch
-                            );
+                                patchedText = App.applyUnifiedPatch(
+                                    previousText, 
+                                    rawPatch
+                                );
 
                             history.commits[idx].text = patchedText;
 
@@ -421,45 +406,60 @@ var App = {
         }
     },
 
+    /**
+     *  Apply a unified patch to the text.
+     *
+     *  @param  text    The text upon which the patch is to be applied. Should 
+     *                  be several lines, most likely.
+     *  @param  patch   The patch code in the unified diff format.
+     */
     applyUnifiedPatch:function(text, patch) {
         var 
-            hunks = unified_patch.parse(patch + "\n"),
-            
             hunk, line, lineIdx,
 
+            // Parse the patch into a list of hunk objects:
+            hunks = unified_patch.parse(patch + "\n"),
+            
+            // Split text by lines. We will progressively push things into a
+            // similar result list.
             pre = text.split("\n"),
             post = [],
 
+            // Algorithm starts at line 1 (1-offset).
             loc = 1,
+
+            // Track drift of applied hunks. Once a hunk is applied, the 
+            // location of subsequent hunks must be translated. Start with zero
+            // drift.
             delta = 0;
         
+        // For each parsed hunk:
         for (var hunkIdx = 0; hunkIdx < hunks.length; ++hunkIdx) {
             hunk = hunks[hunkIdx];
 
             if (hunk.range.preStart < loc - delta) {
-                throw "Hunk ordering???"
+                throw "Hunk starting position precedes last hunk.";
             }
             
+            // Copy in the preceding text, converting to 0-offset indices:
             post = post.concat(
                 pre.slice(
-                    loc + delta - 1,
+                    loc - delta - 1,
                     hunk.range.preStart - 1
                 )
             );
 
+            // The position is now the start of the hunk.
             loc = hunk.range.preStart;
 
+            // For every line in the hunk:
             for (lineIdx = 0; lineIdx < hunk.lines.length; ++lineIdx) {
                 line = hunk.lines[lineIdx];
 
-                if (line.type == 0) {
-                    post.push(
-                        pre[loc + delta - 1]
-                    );
-
-                    ++loc;
-                }
-                else if (line.type == 1) {
+                // If it is a context line or an addition, copy it in directly.
+                // We just ignore removals. (This assumes that the data in the
+                // context line is accurate, which appears to be safe enough.)
+                if (line.type == 0 || line.type == 1) {
                     post.push(
                         line.data
                     );
@@ -468,17 +468,63 @@ var App = {
                 }
             }
 
+            // Accumulate drift (if any):
             delta += hunk.range.postLen - hunk.range.preLen;
         }
 
+        // Copy in any remaining code up to EOF. This starts by computing where 
+        // the remaining file starts without the drift.
         post = post.concat(
             pre.slice(
-                loc + delta - 1
+                loc - delta - 1
             )
         );
 
+        //console.log(pre, patch, post);
+        console.log(patch, App.relevantLines(patch));
+
         return post.join("\n");
-    }
+    },
+
+    relevantLines:function(patch) {
+        var 
+            hunk, line, lineIdx, hunkPos,
+
+            hunks = unified_patch.parse(patch + "\n"),
+
+            added = [],
+            removed = [];
+
+        for (var hunkIdx = 0; hunkIdx < hunks.length; ++hunkIdx) {
+            hunk = hunks[hunkIdx];
+            hunkPos = 0;
+
+            for (lineIdx = 0; lineIdx < hunk.lines.length; ++lineIdx) {
+                line = hunk.lines[lineIdx];
+                
+                if (line.type == 1) {
+                    added.push(
+                        hunk.range.preStart + hunkPos
+                    );
+                    ++hunkPos;
+                }
+                else if (line.type == -1) {
+                    removed.push(
+                        hunk.range.preStart + hunkPos
+                    );
+                }
+                else if (line.type == 0) {
+                    ++hunkPos;
+                }
+            }
+        }
+
+        return {
+            added:added,
+            removed:removed
+        };
+    },
+
 };
 
 /**
