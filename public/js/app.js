@@ -322,8 +322,6 @@ var App = {
 
             ol.appendTo("#code");
 
-            document.title = oldTitle;
-
             if (lastPatch) {
                 var lines = App.relevantLines(lastPatch);
 
@@ -335,6 +333,8 @@ var App = {
                         .addClass("new");
                 }
             }
+
+            document.title = oldTitle;
 
             if ($.isFunction(fn)) { fn(); }
         }
@@ -413,7 +413,10 @@ var App = {
 
                             history.commits[idx].text = patchedText;
 
-                            fn(patchedText, rawPatch);
+                            fn(
+                                patchedText, 
+                                rawPatch
+                            );
                         }
                     )
                 }
@@ -503,7 +506,8 @@ var App = {
      *  "pre" property which is a list of line numbers to lines which are 
      *  removed or overwritten **based on the pre-patch-application 
      *  numbering**, and a "post" property which is a list of line numbers 
-     *  which are added or new **based on the post-patch-application numbering.
+     *  which are added or new **based on the post-patch-application 
+     *  numbering**.
      *
      *  @param  patch   The patch code in unified diff format.
      */
@@ -576,4 +580,4 @@ $(function(){
     Backbone.history.start({ 
         pushState:false 
     });
-});1
+});
