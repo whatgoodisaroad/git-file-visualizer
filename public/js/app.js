@@ -307,7 +307,7 @@ var App = {
         // Update code display:
 
         // Callback, given the next text, do the work to display it.:
-        function applyText(text) { 
+        function applyText(text, lastPatch) { 
             $("#code").html("");
 
             var 
@@ -323,6 +323,18 @@ var App = {
             ol.appendTo("#code");
 
             document.title = oldTitle;
+
+            if (lastPatch) {
+                var lines = App.relevantLines(lastPatch);
+
+                $("#code ol li.new")
+                    .removeClass("new");
+
+                for (var idx = 0; idx < lines.post.length; ++idx) {
+                    $("#code ol li:eq(" + lines.post[idx] + ")")
+                        .addClass("new");
+                }
+            }
 
             if ($.isFunction(fn)) { fn(); }
         }
@@ -360,7 +372,10 @@ var App = {
 
         // If this commit is already evaluated:
         if (history.commits[idx].text) {
-            fn(history.commits[idx].text);
+            fn(
+                history.commits[idx].text,
+                history.commits[idx].blob.patch
+            );
             return;
         }
 
@@ -398,7 +413,7 @@ var App = {
 
                             history.commits[idx].text = patchedText;
 
-                            fn(patchedText);
+                            fn(patchedText, rawPatch);
                         }
                     )
                 }
@@ -411,7 +426,7 @@ var App = {
      *
      *  @param  text    The text upon which the patch is to be applied. Should 
      *                  be several lines, most likely.
-     *  @param  patch   The patch code in the unified diff format.
+     *  @param  patch   The patch code in unified diff format.
      */
     applyUnifiedPatch:function(text, patch) {
         var 
@@ -480,48 +495,60 @@ var App = {
             )
         );
 
-        //console.log(pre, patch, post);
-        console.log(patch, App.relevantLines(patch));
-
         return post.join("\n");
     },
 
+    /**
+     *  Calculate the lines touched by a patch file. Returns an object with a 
+     *  "pre" property which is a list of line numbers to lines which are 
+     *  removed or overwritten **based on the pre-patch-application 
+     *  numbering**, and a "post" property which is a list of line numbers 
+     *  which are added or new **based on the post-patch-application numbering.
+     *
+     *  @param  patch   The patch code in unified diff format.
+     */
     relevantLines:function(patch) {
         var 
-            hunk, line, lineIdx, hunkPos,
+            hunk, line, lineIdx, postPos, prePos,
 
             hunks = unified_patch.parse(patch + "\n"),
 
             added = [],
-            removed = [];
+            removed = [],
+
+            delta = 0;
 
         for (var hunkIdx = 0; hunkIdx < hunks.length; ++hunkIdx) {
             hunk = hunks[hunkIdx];
-            hunkPos = 0;
+            postPos = 0;
+            prePos = 0;
 
             for (lineIdx = 0; lineIdx < hunk.lines.length; ++lineIdx) {
                 line = hunk.lines[lineIdx];
                 
                 if (line.type == 1) {
                     added.push(
-                        hunk.range.preStart + hunkPos
+                        hunk.range.preStart + postPos
                     );
-                    ++hunkPos;
+                    ++postPos;
+                    ++prePos;
                 }
                 else if (line.type == -1) {
                     removed.push(
-                        hunk.range.preStart + hunkPos
+                        hunk.range.preStart + prePos
                     );
+                    ++prePos;
                 }
                 else if (line.type == 0) {
-                    ++hunkPos;
+                    ++postPos;
+                    ++prePos;
                 }
             }
         }
 
         return {
-            added:added,
-            removed:removed
+            post:added,
+            pre:removed
         };
     },
 

@@ -116,7 +116,10 @@
 }
 
 #code-view #code li.new {
-    color:green;
+    /*color:green;*/
+    background:#dfd;
+    -webkit-border-radius:4px;
+    border-radius:4px;
 }
 
 
