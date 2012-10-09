@@ -329,7 +329,7 @@ var App = {
                     .removeClass("new");
 
                 for (var idx = 0; idx < lines.post.length; ++idx) {
-                    $("#code ol li:eq(" + lines.post[idx] + ")")
+                    $("#code ol li:eq(" + (lines.post[idx] - 1) + ")")
                         .addClass("new");
                 }
             }
@@ -401,6 +401,10 @@ var App = {
                     history.loadCommitByIndex(
                         idx,
                         function() { 
+
+                            if (!history.commits[idx].blob.patch) {
+                                throw "Missing patch!";
+                            }
 
                             // Apply:
                             var 
@@ -513,13 +517,17 @@ var App = {
      */
     relevantLines:function(patch) {
         var 
-            hunk, line, lineIdx, postPos, prePos,
+            hunk, line, lineIdx, 
+
+            // postPos and prePos represent the offset from the hunk start in 
+            // the {post, pre}-application-numbering. They need to be different
+            // because newlines could have been created or old lines destroyed.
+            postPos, prePos,
 
             hunks = unified_patch.parse(patch + "\n"),
-
-            added = [],
-            removed = [],
-
+            
+            added = [], removed = [],
+            
             delta = 0;
 
         for (var hunkIdx = 0; hunkIdx < hunks.length; ++hunkIdx) {
@@ -532,10 +540,9 @@ var App = {
                 
                 if (line.type == 1) {
                     added.push(
-                        hunk.range.preStart + postPos
+                        hunk.range.preStart + postPos + delta
                     );
                     ++postPos;
-                    ++prePos;
                 }
                 else if (line.type == -1) {
                     removed.push(
@@ -548,6 +555,8 @@ var App = {
                     ++prePos;
                 }
             }
+
+            delta += postPos - prePos;
         }
 
         return {
